@@ -10,17 +10,46 @@
 
 	$conn = new mysqli($severname, $username, $password, $dbname);
 
-	$query = "SELECT * FROM posts ORDER BY created_at desc limit 6";
+	//load category
+	$query_category = "SELECT * FROM categories";
+	$result_cate = $conn->query($query_category);
+	$categories = array();
+	while ($row = $result_cate->fetch_assoc()) {
 
-	$result = $conn->query($query);
+		$categories[] = $row;
+	}
+
+	$query_two_posts = "SELECT p. *, c.title as 'category' FROM posts p LEFT JOIN categories c ON p.category_id = c.id WHERE p.status = 1 ORDER BY p.created_at desc  limit 2";
+
+	$result_two_posts = $conn->query($query_two_posts);
+
+	$two_posts = array();
+
+	while ($row = $result_two_posts->fetch_assoc()) {
+		$two_posts[] = $row;
+	}
+
+	$query_recent_posts = "SELECT p. *, c.title as 'category' FROM posts p LEFT JOIN categories c ON p.category_id = c.id WHERE p.status = 1 ORDER BY p.created_at desc  limit 2,6";
+
+	$result_recent_posts = $conn->query($query_recent_posts);
+
+	$recent_posts = array();
+
+	while ($row = $result_recent_posts->fetch_assoc()) {
+		$recent_posts[] = $row;
+	}
+
+	$query_posts = "SELECT p. *, c.title as 'category' FROM posts p LEFT JOIN categories c ON p.category_id = c.id WHERE p.status = 1 ORDER BY p.created_at desc  limit 8,7";
+
+	$result_posts = $conn->query($query_posts);
+
+	$post_in_7posts = $result_posts->fetch_assoc();
 
 	$posts = array();
 
-	while ($row = $result->fetch_assoc()) {
+	while ($row = $result_posts->fetch_assoc()) {
 		$posts[] = $row;
 	}
-
-	
 
 ?>
 
@@ -72,12 +101,16 @@
 
 						<!-- nav -->
 						<ul class="nav-menu nav navbar-nav">
-							<li><a href="category.html">News</a></li>
+							<!-- <li><a href="category.html">News</a></li>
 							<li><a href="category.html">Popular</a></li>
 							<li class="cat-1"><a href="category.html">Web Design</a></li>
 							<li class="cat-2"><a href="category.html">JavaScript</a></li>
-							<li class="cat-3"><a href="category.html">Css</a></li>
-							<li class="cat-4"><a href="category.html">Jquery</a></li>
+							<li class="cat-3"><a href="category.html">Css</a></li> -->
+
+							<?php foreach ($categories as $cate) {
+							?>
+								<li class="cat-4"><a href="category.html"><?= $cate['title']?></a></li>
+							<?php } ?>
 						</ul>
 						<!-- /nav -->
 
@@ -164,22 +197,27 @@
 				<!-- row -->
 				<div class="row">	
 					<!-- post -->
+					<?php
+					foreach ($two_posts as $two_post){
+						
+					?>
 					<div class="col-md-6">
 						<div class="post post-thumb">
-							<a class="post-img" href="blog-post.html"><img src="./img/post-1.jpg" alt=""></a>
+							<a class="post-img" href="blog-post.html"><img src="<?php echo  $two_post['thumbnail']; ?>" alt="" height = "350px";></a>
 							<div class="post-body">
 								<div class="post-meta">
-									<a class="post-category cat-2" href="category.html">JavaScript</a>
-									<span class="post-date">March 27, 2018</span>
+									<a class="post-category cat-2" href="category.html"><?php echo  $two_post['category']; ?></a>
+									<span class="post-date"><?php echo  $two_post['created_at']; ?></span>
 								</div>
-								<h3 class="post-title"><a href="blog-post.html">Chrome Extension Protects Against JavaScript-Based CPU Side-Channel Attacks</a></h3>
+								<h3 class="post-title"><a href="blog-post.html"><?php echo  $two_post['title']; ?></a></h3>
 							</div>
 						</div>
 					</div>
+					<?php } ?>
 					<!-- /post -->
 
 					<!-- post -->
-					<div class="col-md-6">
+					<!-- <div class="col-md-6">
 						<div class="post post-thumb">
 							<a class="post-img" href="blog-post.html"><img src="./img/post-2.jpg" alt=""></a>
 							<div class="post-body">
@@ -190,7 +228,7 @@
 								<h3 class="post-title"><a href="blog-post.html">Ask HN: Does Anybody Still Use JQuery?</a></h3>
 							</div>
 						</div>
-					</div>
+					</div> -->
 					<!-- /post -->
 				</div>
 				<!-- /row -->
@@ -203,19 +241,19 @@
 						</div>
 					</div>
 					<?php
-					foreach ($posts as $post){
+					foreach ($recent_posts as $recent_post){
 						
 					?>
 					<!-- post -->
 					<div class="col-md-4">
 						<div class="post">
-							<a class="post-img" href="blog-post.html"><img src="<?php echo  $post['thumbnail']; ?>" alt="" width = "400px" height = "";></a>
+							<a class="post-img" href="blog-post.html"><img src="<?php echo  $recent_post['thumbnail']; ?>" alt="" width = "400px" height = "300px";></a>
 							<div class="post-body">
 								<div class="post-meta">
-									<a class="post-category cat-1" href="category.html">Web Design</a>
-									<span class="post-date"><?php echo  $post['created_at']; ?></span>
+									<a class="post-category cat-1" href="category.html"><?php echo  $recent_post['category']; ?></a>
+									<span class="post-date"><?php echo  $recent_post['created_at']; ?></span>
 								</div>
-								<h3 class="post-title"><a href="blog-post.html"><?php echo  $post['title']; ?></a></h3>
+								<h3 class="post-title"><a href="blog-post.html"><?php echo  $recent_post['title']; ?></a></h3>
 							</div>
 						</div>
 					</div>
